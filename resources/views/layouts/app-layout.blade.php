@@ -20,23 +20,20 @@
     <div id="cc" class="easyui-layout" data-options="fit:true">
         <div data-options="region:'west',split:true" style="width:300px;">
             <div class="easyui-accordion" data-options="border:false">
+                <div title="Dashboard" data-options="selected:true" style="padding:10px;">
+                </div>
                 <div title="Transaksi" data-options="selected:false" style="padding:10px;">
                     <ul id="transactionTree" class="easyui-tree">
-                        <li data-id="master-stok">Transaksi</li>
+                        <li data-id="sales-order">Data Penjualan</li>
+                        <li data-id="purchase-order">Data Pembelian</li>
                     </ul>
                 </div>
                 <div title="Master Data" data-options="selected:false" style="padding:10px;">
                     <ul id="masterTree" class="easyui-tree">
-                        <li data-id="master-stok">Master Stok</li>
-                        <li data-id="master-gudang">Master Gudang</li>
-                        <li data-id="master-produk">
-                            <span>Master Produk</span>
-                            <ul>
-                                <li data-id="kategori">Data Produk</li>
-                                <li data-id="kategori">Data Kategori</li>
-                                <li data-id="unit">Data Unit</li>
-                            </ul>
-                        </li>
+                        <li data-id="warehouse">Data Gudang</li>
+                        <li data-id="product">Data Produk</li>
+                        <li data-id="product-category">Data Kategori Produk</li>
+                        <li data-id="product-unit">Data Unit Produk</li>
                     </ul>
                 </div>
             </div>
@@ -53,8 +50,12 @@
         $('#transactionTree').tree({
             onClick: function(node) {
                 switch (node.text) {
-                    case 'Transaksi':
-                        addTab('Transaksi', "{{ route('transactions.index') }}");
+                    case 'Data Penjualan':
+                        addTab('Transaksi > Data Penjualan', "{{ route('sales_orders.index') }}");
+                        break;
+
+                    case 'Data Pembelian':
+                        addTab('Transaksi > Data Pembelian', "{{ route('purchase_orders.index') }}");
                         break;
                 }
             }
@@ -63,24 +64,21 @@
         $('#masterTree').tree({
             onClick: function(node) {
                 switch (node.text) {
-                    case 'Master Stok':
-                        addTab('Master Stok', "{{ route('stock_batches.index') }}");
-                        break;
-
-                    case 'Master Gudang':
-                        addTab('Master Gudang', "{{ route('warehouses.index') }}");
+                    case 'Data Gudang':
+                        addTab('Master Data > Data Gudang', "{{ route('warehouses.index') }}");
                         break;
 
                     case 'Data Produk':
-                        addTab('Data Produk', "{{ route('products.index') }}");
+                        addTab('Master Data > Data Produk', "{{ route('products.index') }}");
                         break;
 
-                    case 'Data Kategori':
-                        addTab('Data Kategori', "{{ route('product_categories.index') }}");
+                    case 'Data Kategori Produk':
+                        addTab('Master Data > Data Kategori Produk',
+                            "{{ route('product_categories.index') }}");
                         break;
 
-                    case 'Data Unit':
-                        addTab('Data Unit', "{{ route('product_units.index') }}");
+                    case 'Data Unit Produk':
+                        addTab('Master Data > Data Unit Produk', "{{ route('product_units.index') }}");
                         break;
                 }
             }

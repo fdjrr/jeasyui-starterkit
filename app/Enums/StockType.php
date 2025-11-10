@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum TransactionType: string
+enum StockType: string
 {
     case IN = 'in';
     case OUT = 'out';

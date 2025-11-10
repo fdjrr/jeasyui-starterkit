@@ -4,23 +4,27 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductUnitController;
-use App\Http\Controllers\StockBatchController;
-use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::resource('stock-batches', StockBatchController::class)->names([
-    'index' => 'stock_batches.index',
+Route::resource('sales-orders', SalesOrderController::class)->names([
+    'index' => 'sales_orders.index',
+]);
+
+Route::resource('purchase-orders', PurchaseOrderController::class)->names([
+    'index' => 'purchase_orders.index',
 ]);
 
 Route::resource('warehouses', WarehouseController::class)->names([
     'index' => 'warehouses.index',
 ]);
 
-Route::resource('transactions', TransactionController::class)->names([
-    'index' => 'transactions.index',
+Route::resource('warehouses', WarehouseController::class)->names([
+    'index' => 'warehouses.index',
 ]);
 
 Route::resource('products', ProductController::class)->names([

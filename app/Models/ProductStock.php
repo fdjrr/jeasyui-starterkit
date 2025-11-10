@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
+use App\Enums\StockType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class StockBatch extends Model
+class ProductStock extends Model
 {
     use SoftDeletes;
 
     protected $guarded = ['id'];
 
     /**
-     * Get the product that owns the StockBatch
+     * Get the product that owns the ProductStock
      */
     public function product(): BelongsTo
     {
@@ -21,10 +22,17 @@ class StockBatch extends Model
     }
 
     /**
-     * Get the warehouse that owns the StockBatch
+     * Get the warehouse that owns the ProductStock
      */
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'stock_type' => StockType::class,
+        ];
     }
 }

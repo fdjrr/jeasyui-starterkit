@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -45,6 +46,14 @@ class Product extends Model
      */
     public function product_unit(): BelongsTo
     {
-        return $this->belongsTo(ProductUnit::class, 'product_unit_id', 'id');
+        return $this->belongsTo(ProductUnit::class, 'product_unit_id', ownerKey: 'id');
+    }
+
+    /**
+     * Get all of the product_stocks for the Product
+     */
+    public function product_stocks(): HasMany
+    {
+        return $this->hasMany(ProductStock::class, 'product_id', 'id');
     }
 }
