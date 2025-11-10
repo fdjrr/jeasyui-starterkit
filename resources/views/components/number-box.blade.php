@@ -1,5 +1,5 @@
 @php
-    $defaultClass = 'easyui-textbox';
+    $defaultClass = 'easyui-numberbox';
 @endphp
 
 <input {{ $attributes->merge(['class' => $defaultClass]) }}>

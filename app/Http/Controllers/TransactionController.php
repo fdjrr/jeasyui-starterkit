@@ -12,7 +12,7 @@ class TransactionController extends Controller
         $transactions = Transaction::query();
 
         return view('pages.transactions.index', [
-            'transactions' => $transactions
+            'transactions' => $transactions,
         ]);
     }
 }

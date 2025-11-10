@@ -18,33 +18,74 @@
 
 <body>
     <div id="cc" class="easyui-layout" data-options="fit:true">
-        <div data-options="region:'west',split:true,collapsed:true,
-                hideExpandTool: true,
-                expandMode: null,
-                hideCollapsedContent: false,
-                collapsedSize: 68,
-                collapsedContent: function(){
-                    return $('#titlebar');
-                }
-                "
-            title="West" style="width:100px;"></div>
+        <div data-options="region:'west',split:true" style="width:300px;">
+            <div class="easyui-accordion" data-options="border:false">
+                <div title="Transaksi" data-options="selected:false" style="padding:10px;">
+                    <ul id="transactionTree" class="easyui-tree">
+                        <li data-id="master-stok">Transaksi</li>
+                    </ul>
+                </div>
+                <div title="Master Data" data-options="selected:false" style="padding:10px;">
+                    <ul id="masterTree" class="easyui-tree">
+                        <li data-id="master-stok">Master Stok</li>
+                        <li data-id="master-gudang">Master Gudang</li>
+                        <li data-id="master-produk">
+                            <span>Master Produk</span>
+                            <ul>
+                                <li data-id="kategori">Data Produk</li>
+                                <li data-id="kategori">Data Kategori</li>
+                                <li data-id="unit">Data Unit</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div data-options="region:'center'">
             <div id="tt" class="easyui-tabs" data-options="fit:true"></div>
         </div>
-    </div>
-    <div id="titlebar" style="padding:2px">
-        <a href="javascript:void(0)" class="easyui-linkbutton" style="width:100%"
-            data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'"
-            onclick="addTab('Data Transaksi', '{{ route('transactions.index') }}')">Trx</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" style="width:100%"
-            data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'"
-            onclick="addTab('Master Produk', '{{ route('products.index') }}')">Product</a>
     </div>
 
     <script type="text/javascript" src="{{ asset('assets/js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/jquery.easyui.min.js') }}"></script>
 
     <script>
+        $('#transactionTree').tree({
+            onClick: function(node) {
+                switch (node.text) {
+                    case 'Transaksi':
+                        addTab('Transaksi', "{{ route('transactions.index') }}");
+                        break;
+                }
+            }
+        });
+
+        $('#masterTree').tree({
+            onClick: function(node) {
+                switch (node.text) {
+                    case 'Master Stok':
+                        addTab('Master Stok', "{{ route('stock_batches.index') }}");
+                        break;
+
+                    case 'Master Gudang':
+                        addTab('Master Gudang', "{{ route('warehouses.index') }}");
+                        break;
+
+                    case 'Data Produk':
+                        addTab('Data Produk', "{{ route('products.index') }}");
+                        break;
+
+                    case 'Data Kategori':
+                        addTab('Data Kategori', "{{ route('product_categories.index') }}");
+                        break;
+
+                    case 'Data Unit':
+                        addTab('Data Unit', "{{ route('product_units.index') }}");
+                        break;
+                }
+            }
+        });
+
         function addTab(title, url) {
             if ($('#tt').tabs('exists', title)) {
                 $('#tt').tabs('select', title);
@@ -54,7 +95,7 @@
                 $('#tt').tabs('add', {
                     title: title,
                     content: content,
-                    closable: true
+                    closable: true,
                 });
             }
         }

@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -14,9 +15,9 @@ return new class extends Migration {
             $table->id();
             $table->string('code')->index();
             $table->string('name');
+            $table->string('sku')->index()->nullable();
             $table->foreignId('product_category_id')->constrained('product_categories');
             $table->foreignId('product_unit_id')->constrained('product_units');
-            $table->string('sku')->index()->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();

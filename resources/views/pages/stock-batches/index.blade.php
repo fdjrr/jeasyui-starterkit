@@ -1,35 +1,48 @@
 <x-default-layout>
     <div id="dg"></div>
     <div id="tb">
-        <x-button href="javascript:void(0)" iconCls="icon-add" plain="true" onclick="newTransaction()">Tambah</x-button>
-        <x-button href="javascript:void(0)" iconCls="icon-edit" plain="true" onclick="editTransaction()">Edit</x-button>
+        <x-button href="javascript:void(0)" iconCls="icon-add" plain="true" onclick="newStockBatch()">Tambah</x-button>
+        <x-button href="javascript:void(0)" iconCls="icon-edit" plain="true" onclick="editStockBatch()">Edit</x-button>
         <x-button href="javascript:void(0)" iconCls="icon-remove" plain="true"
-            onclick="destroyTransaction()">Hapus</x-button>
+            onclick="destroyStockBatch()">Hapus</x-button>
     </div>
 
-    <div id="dlg" style="width:750px;height:600px">
+    <div id="dlg" style="width:500px">
         <form id="fm" method="post" novalidate style="margin:0;padding:20px">
             <div style="margin-bottom:10px">
-                <x-text-box name="code" required="true" label="Kode Transaksi:" labelPosition="top"
+                <x-text-box name="batch_code" required="true" label="Kode Stok:" labelPosition="top"
                     style="width:100%" />
+            </div>
+            <div style="margin-bottom:10px">
+                <input name="product_code" id="product_code" style="width:100%" />
             </div>
             <div style="margin-bottom:10px">
                 <input name="warehouse_code" id="warehouse_code" style="width:100%" />
             </div>
             <div style="margin-bottom:10px">
-                <x-date-box name="trx_date" id="trx_date" required="true" label="Tanggal Transaksi:"
+                <x-text-box name="qty_in" required="true" label="Qty Masuk:" labelPosition="top" style="width:100%" />
+            </div>
+            <div style="margin-bottom:10px">
+                <x-text-box name="qty_out" required="true" label="Qty Keluar:" labelPosition="top" style="width:100%" />
+            </div>
+            <div style="margin-bottom:10px">
+                <x-number-box name="purchase_price" required="true" precision="2" groupSeparator="."
+                    decimalSeparator="," label="Harga Beli:" labelPosition="top" style="width:100%" />
+            </div>
+            <div style="margin-bottom:10px">
+                <x-date-box name="received_at" id="received_at" required="true" label="Tanggal Terima:"
                     labelPosition="top" style="width:100%" />
             </div>
             <div style="margin-bottom:10px">
-                <x-text-box name="note" label="Catatan:" labelPosition="top" multiline="true"
-                    style="width: 100%;height:120px"></x-text-box>
+                <x-date-box name="expired_at" id="expired_at" label="Tanggal Kadaluarsa:" labelPosition="top"
+                    style="width:100%" />
             </div>
         </form>
     </div>
     <div id="dlg-buttons">
         <x-button href="javascript:void(0)" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')"
             style="width:90px">Cancel</x-button>
-        <x-button href="javascript:void(0)" class="c6" iconCls="icon-ok" onclick="saveTransaction()"
+        <x-button href="javascript:void(0)" class="c6" iconCls="icon-ok" onclick="saveStockBatch()"
             style="width:90px">Save</x-button>
     </div>
 </x-default-layout>
@@ -39,7 +52,7 @@
 
 <script>
     $("#dg").datagrid({
-        url: "{{ route('api.v1.transactions.index') }}",
+        url: "{{ route('api.v1.stock_batches.index') }}",
         method: "get",
         toolbar: "#tb",
         pagination: true,
@@ -51,21 +64,53 @@
         multiSort: true,
         columns: [
             [{
-                field: 'code',
-                title: 'Kode Transaksi',
-                sortable: true,
-                width: 100
-            }, {
-                field: "warehouse",
-                title: "Gudang",
-                sortable: true,
-                width: 100,
-            }, {
-                field: "trx_date",
-                title: "Tanggal Transaksi",
-                sortable: true,
-                width: 100,
-            }],
+                    field: "batch_code",
+                    title: "Kode Stok",
+                    sortable: true,
+                    width: 100,
+                }, {
+                    field: "product",
+                    title: "Produk",
+                    sortable: true,
+                    width: 100,
+                },
+                {
+                    field: "warehouse",
+                    title: "Gudang",
+                    sortable: true,
+                    width: 100,
+                },
+                {
+                    field: "qty_in",
+                    title: "Qty Masuk",
+                    sortable: true,
+                    width: 100,
+                },
+                {
+                    field: "qty_out",
+                    title: "Qty Keluar",
+                    sortable: true,
+                    width: 100,
+                },
+                {
+                    field: "purchase_price_formatted",
+                    title: "Harga Beli",
+                    sortable: true,
+                    width: 100,
+                },
+                {
+                    field: "received_at",
+                    title: "Tanggal Terima",
+                    sortable: true,
+                    width: 100,
+                },
+                {
+                    field: "expired_at",
+                    title: "Tanggal Kadaluarsa",
+                    sortable: true,
+                    width: 100,
+                },
+            ],
         ],
     });
 
@@ -74,6 +119,18 @@
         modal: true,
         border: "thin",
         buttons: "#dlg-buttons",
+    });
+
+    $("#product_code").textbox({
+        required: true,
+        label: "Kode Produk:",
+        labelPosition: "top",
+        icons: [{
+            iconCls: 'icon-search',
+            handler: function(e) {
+                $('#w-products').data('targetField', '#product_code').window('open')
+            }
+        }]
     });
 
     $("#warehouse_code").textbox({
@@ -91,22 +148,22 @@
     var url;
     var method;
 
-    function newTransaction() {
-        $("#dlg").dialog("open").dialog("center").dialog("setTitle", "Tambah Transaksi");
+    function newStockBatch() {
+        $("#dlg").dialog("open").dialog("center").dialog("setTitle", "Tambah Stok");
         $("#fm").form("clear");
-        url = "{{ route('api.v1.transactions.store') }}";
+        url = "{{ route('api.v1.stock_batches.store') }}";
         method = "POST";
     }
 
-    function editTransaction() {
+    function editStockBatch() {
         var row = $("#dg").datagrid("getSelected");
         if (row) {
             $("#dlg")
                 .dialog("open")
                 .dialog("center")
-                .dialog("setTitle", "Edit Transaksi");
+                .dialog("setTitle", "Edit Stok");
             $("#fm").form("load", row);
-            url = "{{ route('api.v1.transactions.update', ':id') }}".replace(
+            url = "{{ route('api.v1.stock_batches.update', ':id') }}".replace(
                 ":id",
                 row.id,
             );
@@ -114,7 +171,7 @@
         }
     }
 
-    function saveTransaction() {
+    function saveStockBatch() {
         var formData = new FormData($("#fm")[0]);
         var data = Object.fromEntries(formData);
 
@@ -154,7 +211,7 @@
             });
     }
 
-    function destroyTransaction() {
+    function destroyStockBatch() {
         var row = $("#dg").datagrid("getSelected");
         if (row) {
             $.messager.confirm(
@@ -163,7 +220,7 @@
                 function(r) {
                     if (r) {
                         url =
-                            "{{ route('api.v1.transactions.destroy', ':id') }}".replace(
+                            "{{ route('api.v1.stock_batches.destroy', ':id') }}".replace(
                                 ":id",
                                 row.id,
                             );

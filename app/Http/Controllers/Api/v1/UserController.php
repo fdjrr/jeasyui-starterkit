@@ -16,17 +16,17 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $page  = $request->page ?? 1;
+        $page = $request->page ?? 1;
         $limit = $request->limit ?? 10;
 
         $query = User::query();
 
         $total = $query->count();
-        $rows  = $query->skip(($page - 1) * $limit)->take($limit)->get();
+        $rows = $query->skip(($page - 1) * $limit)->take($limit)->get();
 
         return response()->json([
-            'rows'  => $rows,
-            'total' => $total
+            'rows' => $rows,
+            'total' => $total,
         ]);
     }
 
@@ -36,15 +36,15 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'User created successfully!',
-            'data'    => $user,
+            'data' => $user,
         ]);
     }
 
@@ -62,7 +62,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = [
-            'name'  => $request->name,
+            'name' => $request->name,
             'email' => $request->email,
         ];
 
@@ -75,7 +75,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User created successfully!',
-            'data'    => $user,
+            'data' => $user,
         ]);
     }
 

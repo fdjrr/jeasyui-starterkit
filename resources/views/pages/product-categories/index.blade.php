@@ -1,39 +1,37 @@
 <x-default-layout>
     <div id="dg"></div>
     <div id="tb">
-        <x-button href="javascript:void(0)" iconCls="icon-add" plain="true" onclick="newWarehouse()">Tambah</x-button>
-        <x-button href="javascript:void(0)" iconCls="icon-edit" plain="true" onclick="editWarehouse()">Edit</x-button>
+        <x-button href="javascript:void(0)" iconCls="icon-add" plain="true"
+            onclick="newProductCategory()">Tambah</x-button>
+        <x-button href="javascript:void(0)" iconCls="icon-edit" plain="true"
+            onclick="editProductCategory()">Edit</x-button>
         <x-button href="javascript:void(0)" iconCls="icon-remove" plain="true"
-            onclick="destroyWarehouse()">Hapus</x-button>
+            onclick="destroyProductCategory()">Hapus</x-button>
     </div>
 
     <div id="dlg" style="width:400px">
         <form id="fm" method="post" novalidate style="margin:0;padding:20px">
             <div style="margin-bottom:10px">
-                <x-text-box name="code" required="true" label="Kode Gudang:" labelPosition="top"
+                <x-text-box name="code" required="true" label="Kode Kategori:" labelPosition="top"
                     style="width:100%" />
             </div>
             <div style="margin-bottom:10px">
-                <x-text-box name="name" required="true" label="Nama Gudang:" labelPosition="top"
+                <x-text-box name="name" required="true" label="Nama Kategori:" labelPosition="top"
                     style="width:100%" />
-            </div>
-            <div style="margin-bottom:10px">
-                <x-text-box name="address" label="Alamat:" multiline="true" labelPosition="top"
-                    style="width:100%;height:120px" />
             </div>
         </form>
     </div>
     <div id="dlg-buttons">
         <x-button href="javascript:void(0)" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')"
             style="width:90px">Cancel</x-button>
-        <x-button href="javascript:void(0)" class="c6" iconCls="icon-ok" onclick="saveWarehouse()"
+        <x-button href="javascript:void(0)" class="c6" iconCls="icon-ok" onclick="saveProductCategory()"
             style="width:90px">Save</x-button>
     </div>
 </x-default-layout>
 
 <script>
     $("#dg").datagrid({
-        url: "{{ route('api.v1.warehouses.index') }}",
+        url: "{{ route('api.v1.product_categories.index') }}",
         method: "get",
         toolbar: "#tb",
         pagination: true,
@@ -46,17 +44,13 @@
         columns: [
             [{
                 field: 'code',
-                title: 'Kode Gudang',
+                title: 'Kode Kategori',
                 sortable: true,
                 width: 100
             }, {
                 field: 'name',
-                title: 'Nama Gudang',
+                title: 'Nama Kategori',
                 sortable: true,
-                width: 100
-            }, {
-                field: 'address',
-                title: 'Alamat',
                 width: 100
             }]
         ]
@@ -72,24 +66,24 @@
     var url;
     var method;
 
-    function newWarehouse() {
-        $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'Tambah Gudang');
+    function newProductCategory() {
+        $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'Tambah Kategori');
         $('#fm').form('clear');
-        url = "{{ route('api.v1.warehouses.store') }}";
+        url = "{{ route('api.v1.product_categories.store') }}";
         method = "POST";
     }
 
-    function editWarehouse() {
+    function editProductCategory() {
         var row = $('#dg').datagrid('getSelected');
         if (row) {
-            $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'Edit Gudang');
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'Edit Kategori');
             $('#fm').form('load', row);
-            url = "{{ route('api.v1.warehouses.update', ':id') }}".replace(':id', row.id);
+            url = "{{ route('api.v1.product_categories.update', ':id') }}".replace(':id', row.id);
             method = "PUT";
         }
     }
 
-    function saveWarehouse() {
+    function saveProductCategory() {
         var formData = new FormData($("#fm")[0]);
 
         fetch(url, {
@@ -114,12 +108,12 @@
             });
     }
 
-    function destroyWarehouse() {
+    function destroyProductCategory() {
         var row = $('#dg').datagrid('getSelected');
         if (row) {
-            $.messager.confirm('Konfirmasi', 'Apakah anda yakin? Data Gudang akan dihapus!', function(r) {
+            $.messager.confirm('Konfirmasi', 'Apakah anda yakin? Data Kategori akan dihapus!', function(r) {
                 if (r) {
-                    url = "{{ route('api.v1.warehouses.destroy', ':id') }}".replace(':id', row.id);
+                    url = "{{ route('api.v1.product_categories.destroy', ':id') }}".replace(':id', row.id);
 
                     fetch(url, {
                             method: 'DELETE'
@@ -129,7 +123,10 @@
                             if (result.success) {
                                 $('#dg').datagrid('reload');
                             } else {
-                                $.messager.alert('Error', result.message, 'error');
+                                $.messager.show({
+                                    title: 'Error',
+                                    msg: result.message
+                                });
                             }
                         });
                 }
