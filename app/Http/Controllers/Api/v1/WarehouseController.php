@@ -11,12 +11,15 @@ class WarehouseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $page = $request->page ?? 1;
         $limit = $request->limit ?? 10;
 
-        $query = Warehouse::query();
+        $query = Warehouse::query()
+            ->filter([
+                'search' => $request->search,
+            ]);
 
         $total = $query->count();
         $rows = $query->skip(($page - 1) * $limit)->take($limit)->get();

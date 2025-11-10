@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "wsl.exe",
+            "args": [
+                "/home/fadjrir/.config/herd-lite/bin/php",
+                "/home/fadjrir/sites/jeasyui-starterkit/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}

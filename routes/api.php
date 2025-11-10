@@ -3,10 +3,18 @@
 use App\Http\Controllers\Api\v1\ProductCategoryController;
 use App\Http\Controllers\Api\v1\ProductController;
 use App\Http\Controllers\Api\v1\ProductUnitController;
+use App\Http\Controllers\Api\v1\PurchaseOrderController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\WarehouseController;
 
 Route::prefix('v1')->group(function () {
+    Route::apiResource('purchase-orders', PurchaseOrderController::class)->names([
+        'index' => 'api.v1.purchase-orders.index',
+        'store' => 'api.v1.purchase-orders.store',
+        'update' => 'api.v1.purchase-orders.update',
+        'destroy' => 'api.v1.purchase-orders.destroy',
+    ]);
+
     Route::apiResource('warehouses', WarehouseController::class)->names([
         'index' => 'api.v1.warehouses.index',
         'store' => 'api.v1.warehouses.store',
