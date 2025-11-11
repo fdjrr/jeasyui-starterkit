@@ -14,7 +14,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $page = $request->page ?? 1;
-        $limit = $request->limit ?? 10;
+        $rows = $request->rows ?? 10;
 
         $query = Product::query()
             ->with([
@@ -27,7 +27,7 @@ class ProductController extends Controller
             ]);
 
         $total = $query->count();
-        $rows = $query->skip(($page - 1) * $limit)->take($limit)->get();
+        $rows = $query->skip(($page - 1) * $rows)->take($rows)->get();
 
         $products = $rows->map(fn ($product) => [
             ...$product->toArray(),

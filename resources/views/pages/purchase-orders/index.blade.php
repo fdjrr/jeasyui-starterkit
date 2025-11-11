@@ -71,7 +71,7 @@
     var itemsData = [];
 
     $("#dg").datagrid({
-        url: "{{ route('api.v1.purchase-orders.index') }}",
+        url: "{{ route('api.v1.purchase_orders.index') }}",
         method: "get",
         toolbar: "#tb",
         pagination: true,
@@ -95,7 +95,7 @@
             }, {
                 field: 'note',
                 title: 'Catatan',
-                width: 150
+                width: 100
             }]
         ]
     })
@@ -128,6 +128,7 @@
         modal: true,
         border: 'thin',
         buttons: "#dlg-buttons",
+        height: 'auto',
     })
 
     $("#dlg-item").dialog({
@@ -148,7 +149,9 @@
         itemsData = [];
         $('#dg-items').datagrid('loadData', itemsData);
 
-        url = "{{ route('api.v1.purchase-orders.store') }}";
+        $('#dlg').dialog('resize');
+
+        url = "{{ route('api.v1.purchase_orders.store') }}";
         method = "POST";
     }
 
@@ -169,7 +172,9 @@
             }));
             $('#dg-items').datagrid('loadData', itemsData);
 
-            url = "{{ route('api.v1.purchase-orders.update', ':id') }}".replace(':id', row.id);
+            $('#dlg').dialog('resize');
+
+            url = "{{ route('api.v1.purchase_orders.update', ':id') }}".replace(':id', row.id);
             method = "PUT";
         }
     }
@@ -179,7 +184,6 @@
         $('#dlg-item').dialog('open').dialog('center').dialog('setTitle', 'Tambah Item');
         $('#fm-item').form('clear');
 
-        // Clear hidden fields
         $('#product_id').val('');
         $('#product_name').val('');
         $('#warehouse_id').val('');
@@ -269,9 +273,9 @@
     function destroyPurchaseOrder() {
         var row = $('#dg').datagrid('getSelected');
         if (row) {
-            $.messager.confirm('Konfirmasi', 'Apakah anda yakin? Data Data Pembelian akan dihapus!', function(r) {
+            $.messager.confirm('Konfirmasi', 'Apakah anda yakin? Data Pembelian akan dihapus!', function(r) {
                 if (r) {
-                    url = "{{ route('api.v1.purchase-orders.destroy', ':id') }}".replace(':id', row.id);
+                    url = "{{ route('api.v1.purchase_orders.destroy', ':id') }}".replace(':id', row.id);
 
                     fetch(url, {
                             method: 'DELETE'
@@ -342,9 +346,8 @@
         }
     });
 
-    // Function to find product by code
     function findProductByCode(code) {
-        fetch("{{ route('api.v1.products.index') }}?search=" + code + "&limit=1000")
+        fetch("{{ route('api.v1.products.index') }}?search=" + code)
             .then(response => response.json())
             .then(result => {
                 if (result.rows && result.rows.length > 0) {
@@ -371,9 +374,8 @@
             });
     }
 
-    // Function to find warehouse by code
     function findWarehouseByCode(code) {
-        fetch("{{ route('api.v1.warehouses.index') }}?search=" + code + "&limit=1000")
+        fetch("{{ route('api.v1.warehouses.index') }}?search=" + code)
             .then(response => response.json())
             .then(result => {
                 if (result.rows && result.rows.length > 0) {

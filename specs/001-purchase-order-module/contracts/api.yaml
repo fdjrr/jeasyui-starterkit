@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Purchase Order Management API
+  version: 1.0.0
+paths:
+  /api/purchase-orders:
+    get:
+      summary: List all purchase orders
+      responses:
+        '200':
+          description: A list of purchase orders.
+    post:
+      summary: Create a new purchase order
+      responses:
+        '201':
+          description: Purchase order created successfully.
+  /api/purchase-orders/{id}:
+    get:
+      summary: Get a specific purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The purchase order.
+    put:
+      summary: Update a purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Purchase order updated successfully.
+    delete:
+      summary: Delete a purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Purchase order deleted successfully.
+  /api/purchase-orders/{id}/approve:
+    post:
+      summary: Approve a purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Purchase order approved successfully.
+  /api/purchase-orders/{id}/history:
+    get:
+      summary: Get the history of a purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of history records for the purchase order.

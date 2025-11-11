@@ -12,6 +12,11 @@ class PurchaseOrderItem extends Model
 
     protected $guarded = ["id"];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     /**
      * Get the purchase_order that owns the PurchaseOrderItem
      *
@@ -30,15 +35,5 @@ class PurchaseOrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');
-    }
-
-    /**
-     * Get the warehouse that owns the PurchaseOrderItem
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
 }

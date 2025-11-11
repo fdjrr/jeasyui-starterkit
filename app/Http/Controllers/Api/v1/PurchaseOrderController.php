@@ -2,190 +2,62 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Enums\PurchaseOrderStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePurchaseOrderRequest;
+use App\Http\Requests\UpdatePurchaseOrderRequest;
 use App\Models\PurchaseOrder;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use App\Services\PurchaseOrderService;
 
 class PurchaseOrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function __construct(protected PurchaseOrderService $purchaseOrderService)
     {
-        $page = $request->page ?? 1;
-        $limit = $request->limit ?? 10;
-
-        $query = PurchaseOrder::query()
-            ->with([
-                'purchase_order_items.product',
-                'purchase_order_items.warehouse',
-            ]);
-
-        $total = $query->count();
-        $rows = $query->skip(($page - 1) * $limit)->take($limit)->get();
-
-        return response()->json([
-            'rows' => $rows,
-            'total' => $total,
-        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StorePurchaseOrderRequest $request)
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255', 'unique:purchase_orders,code'],
-            'date' => ['required', 'string'],
-            'note' => ['nullable', 'string'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
-            'items.*.warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'items.*.qty' => ['required', 'integer', 'min:1'],
-        ], attributes: [
-            'code' => 'Kode Order',
-            'date' => 'Tanggal',
-            'note' => 'Catatan',
-            'items' => 'Item',
-            'items.*.product_id' => 'Produk',
-            'items.*.warehouse_id' => 'Gudang',
-            'items.*.qty' => 'Jumlah',
-        ]);
+        $purchaseOrder = $this->purchaseOrderService->create($request->validated());
 
-        DB::beginTransaction();
+        return response()->json($purchaseOrder, 201);
+    }
 
-        try {
-            $purchaseOrder = PurchaseOrder::query()->create([
-                'code' => $validated['code'],
-                'date' => $validated['date'],
-                'note' => $validated['note'] ?? null,
-            ]);
-
-            foreach ($validated['items'] as $item) {
-                $purchaseOrder->purchase_order_items()->create([
-                    'product_id' => $item['product_id'],
-                    'warehouse_id' => $item['warehouse_id'],
-                    'qty' => $item['qty'],
-                ]);
+    public function update(UpdatePurchaseOrderRequest $request, PurchaseOrder $purchaseOrder)
+    {
+        if ($request->has('status')) {
+            $status = PurchaseOrderStatus::from($request->input('status'));
+            if ($status === PurchaseOrderStatus::PENDING) {
+                $purchaseOrder = $this->purchaseOrderService->submit($purchaseOrder);
+            } elseif ($status === PurchaseOrderStatus::CANCELLED) {
+                $purchaseOrder = $this->purchaseOrderService->reject($purchaseOrder);
+            } else {
+                $purchaseOrder->update($request->validated());
             }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Data Pembelian berhasil disimpan!',
-                'data' => $purchaseOrder->load('purchase_order_items'),
-            ]);
-        } catch (Throwable $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data!',
-            ], 500);
+        } else {
+            $purchaseOrder->update($request->validated());
         }
+
+        return response()->json($purchaseOrder);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PurchaseOrder $purchaseOrder)
+    public function approve(PurchaseOrder $purchaseOrder)
     {
-        return response()->json([
-            'success' => true,
-            'data' => $purchaseOrder->load([
-                'purchase_order_items.product',
-                'purchase_order_items.warehouse',
-            ]),
-        ]);
+        $purchaseOrder = $this->purchaseOrderService->approve($purchaseOrder);
+
+        return response()->json($purchaseOrder);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PurchaseOrder $purchaseOrder)
+    public function reject(PurchaseOrder $purchaseOrder)
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255', 'unique:purchase_orders,code,'.$purchaseOrder->id],
-            'date' => ['required', 'string'],
-            'note' => ['nullable', 'string'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
-            'items.*.warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'items.*.qty' => ['required', 'integer', 'min:1'],
-        ], attributes: [
-            'code' => 'Kode Order',
-            'date' => 'Tanggal',
-            'note' => 'Catatan',
-            'items' => 'Item',
-            'items.*.product_id' => 'Produk',
-            'items.*.warehouse_id' => 'Gudang',
-            'items.*.qty' => 'Jumlah',
-        ]);
+        $purchaseOrder = $this->purchaseOrderService->reject($purchaseOrder);
 
-        DB::beginTransaction();
-        try {
-            $purchaseOrder->update([
-                'code' => $validated['code'],
-                'date' => $validated['date'],
-                'note' => $validated['note'] ?? null,
-            ]);
-
-            $purchaseOrder->purchase_order_items()->delete();
-
-            foreach ($validated['items'] as $item) {
-                $purchaseOrder->purchase_order_items()->create([
-                    'product_id' => $item['product_id'],
-                    'warehouse_id' => $item['warehouse_id'],
-                    'qty' => $item['qty'],
-                ]);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Data Pembelian berhasil disimpan!',
-                'data' => $purchaseOrder->load('purchase_order_items'),
-            ]);
-        } catch (Throwable $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data!',
-            ], 500);
-        }
+        return response()->json($purchaseOrder);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PurchaseOrder $purchaseOrder)
+    public function history(PurchaseOrder $purchaseOrder)
     {
-        DB::beginTransaction();
+        $history = $this->purchaseOrderService->getHistory($purchaseOrder);
 
-        try {
-            $purchaseOrder->purchase_order_items()->delete();
-            $purchaseOrder->delete();
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Data Pembelian berhasil dihapus!',
-            ]);
-        } catch (Throwable $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menghapus data!',
-            ], 500);
-        }
+        return response()->json($history);
     }
 }

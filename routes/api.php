@@ -8,11 +8,14 @@ use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\WarehouseController;
 
 Route::prefix('v1')->group(function () {
+    Route::post('purchase-orders/{purchase_order}/approve', [PurchaseOrderController::class, 'approve'])->name('api.v1.purchase_orders.approve');
+    Route::get('purchase-orders/{purchase_order}/history', [PurchaseOrderController::class, 'history'])->name('api.v1.purchase_orders.history');
+
     Route::apiResource('purchase-orders', PurchaseOrderController::class)->names([
-        'index' => 'api.v1.purchase-orders.index',
-        'store' => 'api.v1.purchase-orders.store',
-        'update' => 'api.v1.purchase-orders.update',
-        'destroy' => 'api.v1.purchase-orders.destroy',
+        'index' => 'api.v1.purchase_orders.index',
+        'store' => 'api.v1.purchase_orders.store',
+        'update' => 'api.v1.purchase_orders.update',
+        'destroy' => 'api.v1.purchase_orders.destroy',
     ]);
 
     Route::apiResource('warehouses', WarehouseController::class)->names([

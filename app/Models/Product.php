@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,13 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
 
     public function scopeFilter(Builder $query, array $filters = [])
     {
-        $search = $filters['search'] ?? false;
+        $search              = $filters['search'] ?? false;
         $product_category_id = $filters['product_category_id'] ?? false;
 
         $query->when($search, function ($query, $search) {
@@ -47,13 +48,5 @@ class Product extends Model
     public function product_unit(): BelongsTo
     {
         return $this->belongsTo(ProductUnit::class, 'product_unit_id', ownerKey: 'id');
-    }
-
-    /**
-     * Get all of the product_stocks for the Product
-     */
-    public function product_stocks(): HasMany
-    {
-        return $this->hasMany(ProductStock::class, 'product_id', 'id');
     }
 }

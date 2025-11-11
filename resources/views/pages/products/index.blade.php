@@ -3,6 +3,8 @@
     <div id="tb">
         <x-button href="javascript:void(0)" iconCls="icon-add" plain="true" onclick="newProduct()">Tambah</x-button>
         <x-button href="javascript:void(0)" iconCls="icon-edit" plain="true" onclick="editProduct()">Edit</x-button>
+        <x-button href="javascript:void(0)" iconCls="icon-search" plain="true" onclick="showProductStock()">Lihat
+            Stock</x-button>
         <x-button href="javascript:void(0)" iconCls="icon-remove" plain="true"
             onclick="destroyProduct()">Hapus</x-button>
     </div>

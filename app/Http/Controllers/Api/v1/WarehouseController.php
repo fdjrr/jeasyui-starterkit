@@ -14,7 +14,7 @@ class WarehouseController extends Controller
     public function index(Request $request)
     {
         $page = $request->page ?? 1;
-        $limit = $request->limit ?? 10;
+        $rows = $request->limit ?? 10;
 
         $query = Warehouse::query()
             ->filter([
@@ -22,7 +22,7 @@ class WarehouseController extends Controller
             ]);
 
         $total = $query->count();
-        $rows = $query->skip(($page - 1) * $limit)->take($limit)->get();
+        $rows = $query->skip(($page - 1) * $rows)->take($rows)->get();
 
         return response()->json([
             'rows' => $rows,
